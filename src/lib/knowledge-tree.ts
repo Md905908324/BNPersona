@@ -43,20 +43,25 @@ export function layoutKnowledge(root:KnowledgeNode,collapsed:string[]=[]){
  const mass=(n:KnowledgeNode):number=>Math.max(1,children(n).reduce((sum,ch)=>sum+mass(ch),0));
  const out:(PositionedNode&{angle:number})[]=[];
  function place(n:KnowledgeNode,parent:string|undefined,depth:number,start:number,end:number,branch?:string){
-  const width=[360,270,238,210,190][Math.min(depth,4)],font=[30,20,17,15,14][Math.min(depth,4)];
+  const width=[520,270,238,210,190][Math.min(depth,4)],font=[64,20,17,15,14][Math.min(depth,4)];
   const preview=nodePreview(n.detail),labelLines=wrappedLines(n.label,Math.floor((width-40)/(font*.56)));
   const detailLines=wrappedLines(preview,Math.floor((width-40)/(13*.55)));
-  const height=Math.max(depth===0?190:124,48+labelLines*font*1.4+detailLines*19+(preview.length<n.detail.length?22:0));
+  const height=Math.max(depth===0?260:124,48+labelLines*font*1.4+detailLines*19+(preview.length<n.detail.length?22:0));
   out.push({...n,parent,x:0,y:0,depth,branch,source:n.sourceIds[0],width,height,preview,angle:(start+end)/2});
-  const kids=children(n),weights=kids.map(ch=>depth===0?Math.sqrt(mass(ch)):mass(ch)),total=weights.reduce((a,b)=>a+b,0);let cursor=start;
+  const kids=children(n),weights=kids.map(ch=>depth===0?1:mass(ch)),total=weights.reduce((a,b)=>a+b,0);let cursor=start;
   kids.forEach((child,i)=>{const span=(end-start)*weights[i]/total,gap=Math.min(.065,span*.12);place(child,n.id,depth+1,cursor+gap/2,cursor+span-gap/2,branch||child.id);cursor+=span;});
  }
  place(root,undefined,0,-Math.PI/2,Math.PI*1.5);
- let previousRadius=0,previousDiameter=Math.hypot(out[0].width,out[0].height);
- for(let depth=1;depth<=Math.max(...out.map(n=>n.depth));depth++){
+ const maxDepth=Math.max(...out.map(n=>n.depth));
+ const diameters=Array.from({length:maxDepth+1},(_,depth)=>Math.max(...out.filter(n=>n.depth===depth).map(n=>Math.hypot(n.width,n.height))));
+ // One common ring interval makes depth a reliable visual distance. Increase it
+ // only when a larger persona needs extra room to keep its cards separated.
+ let interval=680;
+ for(let depth=1;depth<=maxDepth;depth++)interval=Math.max(interval,(diameters[depth-1]+diameters[depth])/2+65,(diameters[depth]+45)*out.filter(n=>n.depth===depth).length/(Math.PI*2*.85*depth));
+ for(let depth=1;depth<=maxDepth;depth++){
   const ring=out.filter(n=>n.depth===depth).sort((a,b)=>a.angle-b.angle);
   const diameter=Math.max(...ring.map(n=>Math.hypot(n.width,n.height)));
-  const radius=Math.max(depth*380,previousRadius+(previousDiameter+diameter)/2+65,(diameter+45)*ring.length/(Math.PI*2*.85));
+  const radius=depth*interval;
   const gap=2*Math.asin((diameter+40)/(2*radius));
   // Relax crowded angles locally instead of enlarging the entire map for one
   // busy branch. Ordering stays stable, so descendants keep their sector order.
@@ -67,7 +72,6 @@ export function layoutKnowledge(root:KnowledgeNode,collapsed:string[]=[]){
    if(correction<.00001)break;
   }
   for(const n of ring){n.x=Math.cos(n.angle)*radius;n.y=Math.sin(n.angle)*radius;}
-  previousRadius=radius;previousDiameter=diameter;
  }
  const minX=Math.min(...out.map(n=>n.x-n.width/2))-100,maxX=Math.max(...out.map(n=>n.x+n.width/2))+100;
  const minY=Math.min(...out.map(n=>n.y-n.height/2))-100,maxY=Math.max(...out.map(n=>n.y+n.height/2))+100;

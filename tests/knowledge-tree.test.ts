@@ -13,4 +13,8 @@ test('the root is largest and themes radiate around all four quadrants',()=>{
  assert.ok(nodes.every(n=>n.width<=root.width));
  assert.ok(nodes.filter(n=>n.depth>0).every(n=>n.width<nodes.find(p=>p.id===n.parent)!.width));
  const quadrants=new Set(nodes.filter(n=>n.depth===1).map(n=>`${n.x>root.x}:${n.y>root.y}`));assert.equal(quadrants.size,4);
+ const themes=nodes.filter(n=>n.depth===1),interval=Math.hypot(themes[0].x-root.x,themes[0].y-root.y);assert.ok(interval>=680);
+ for(const n of nodes.filter(n=>n.depth>0))assert.ok(Math.abs(Math.hypot(n.x-root.x,n.y-root.y)-interval*n.depth)<.001,'Each level shares an equally spaced radius');
+ const angles=themes.map(n=>Math.atan2(n.y-root.y,n.x-root.x)).sort((a,b)=>a-b);
+ for(let i=1;i<angles.length;i++)assert.ok(Math.abs(angles[i]-angles[i-1]-2*Math.PI/7)<.001,'Primary dimensions are equidistant');
 });

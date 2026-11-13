@@ -87,3 +87,5 @@ body,.main-content{background:var(--background)}
 .branch-collapse{width:25px;height:25px;top:-9px;right:-9px}.branch-node .new-knowledge-label{line-height:14px}
 @media(max-width:760px){.branch-body{grid-template-columns:minmax(350px,1fr) 270px;min-width:620px}.branch-body .branch-viewport,.branch-body .branch-inspector{height:640px}.branch-body .branch-inspector{padding:20px}}
 .branch-node.depth-0 strong{font-size:30px}
+.branch-node.depth-0 strong{font-size:48px;line-height:1.4;font-weight:750}.branch-node.depth-0>button:first-child{border-radius:38px}
+.branch-node.depth-0 strong{font-size:64px}
