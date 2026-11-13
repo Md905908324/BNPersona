@@ -64,3 +64,5 @@ body,.main-content{background:var(--background)}
 .source-link{max-width:100%;white-space:normal;text-align:left;overflow-wrap:anywhere;line-height:1.45}
 .source-row{gap:12px}.source-row>span{flex-shrink:0}.bnp-header-logo{width:125px;height:30px;object-fit:contain;margin-right:20px;flex-shrink:0}
 @media(max-width:700px){.bnp-header-logo{width:90px;margin-right:8px}}
+
+.button.back-to-search{background:#087b55;border:1px solid #087b55;color:#ffed70;font-weight:650;white-space:nowrap}.button.back-to-search:hover{background:#066342;border-color:#066342;color:#fff19a}.button.back-to-search:focus-visible{outline:3px solid #c59a16;outline-offset:3px}
