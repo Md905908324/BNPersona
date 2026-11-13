@@ -1,3 +1,4 @@
+import {opportunityBrief} from './opportunity';
 import {calendarDate,dateFromInput} from './timeline';
 import {composeGuide} from './preparation';
 import type {Client,Product,Match,Level,Change,FieldKey,Source} from './types';
@@ -22,7 +23,7 @@ export function matchClient(c:Client,p:Product):Match{
  const eligible=!reason;
  const urgency:Level=d===undefined?'Unknown':d<=30?'High':d<=60?'Medium':'Low';
  const recordedInterest=c.category===p.category?c.interest:String(c.facts.find(f=>f.key==='interest'&&f.status==='Verified'&&String(f.value).toLowerCase().includes(p.category.toLowerCase()))?.value||'');
- const acceptance:Level=c.category!==p.category||stale||disputed||!recordedInterest?'Unknown':c.appetite;
+ const acceptance:Level=opportunityBrief(c,p).readiness;
  return {client:c,eligible,reason:reason||(p.category==='FX'?`${c.currency} ${remaining(c).toLocaleString('en-US')} unhedged supplier payments due in ${d} days.`:c.priority),urgency,acceptance,interestStatus:stale||disputed?'Unknown':recordedInterest?'Documented interest':'Inferred product fit',evidence:stale||disputed||sourceMissing?'Needs review':c.sources.some(s=>s.id===c.sourceId&&s.status==='Verified')?'Strong':'Limited',drivers:[c.interest?`Recorded interest: ${c.interest}`:'Verified exposure suggests fit; no direct appetite recorded.',d===undefined?'Payment timing needs confirmation.':`Recorded ${p.category==='FX'?'payment':'review / shipment'} deadline: ${calendarDate(c.due)} (${d} days remaining from ${calendarDate(SCENARIO_DAY)}). This is not a forecast of purchase timing.`,stale?'Evidence requires reconfirmation.':`Source ${c.sourceId} reviewed by ${c.owner}.`],counter:[c.objection||'No unresolved objection is recorded.',...(c.interest?[]:['Interest in purchasing this product is unconfirmed.'])]};
 }
 export function discover(clients:Client[],p:Product,sort='priority'){const rank:Record<Level,number>={High:0,Medium:1,Low:2,Unknown:3};return clients.map(c=>matchClient(c,p)).sort((a,b)=>Number(b.eligible)-Number(a.eligible)||(sort==='deadline'?(days(a.client)??999)-(days(b.client)??999):rank[a.urgency]-rank[b.urgency]||rank[a.acceptance]-rank[b.acceptance]||(days(a.client)??999)-(days(b.client)??999))||b.client.sourceDay-a.client.sourceDay);}

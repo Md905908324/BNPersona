@@ -1,0 +1,9 @@
+'use client';
+import type {Client,Product} from '@/lib/types';
+import {opportunityBrief} from '@/lib/opportunity';
+import {Badge,LevelBadge,SourceButton} from './ui';
+export function OpportunityBrief({client,product,openSource}:{client:Client;product:Product;openSource:(c:Client,id:string)=>void}){
+ const b=opportunityBrief(client,product);
+ const sources=(ids:string[])=>ids.map(id=><SourceButton key={id} id={id} onClick={()=>openSource(client,id)}/>);
+ return <section className="opportunity-brief" aria-labelledby="opportunity-title"><div className="opportunity-title"><span className="eyebrow">WHY THIS CLIENT / OPPORTUNITY BRIEF</span><h2 id="opportunity-title">{b.headline}</h2><p>{b.quantitative}</p></div><div className="opportunity-layout"><div className="opportunity-sections">{b.sections.map(s=><article key={s.title}><div><h3>{s.title}</h3><Badge tone={s.kind==='Documented context'?'green':s.kind==='To confirm'?'amber':'gray'}>{s.kind}</Badge></div><p>{s.text}</p><div className="inline-badges">{sources(s.sourceIds)}</div></article>)}</div><aside className="readiness-panel"><span className="eyebrow">READINESS FOR DISCUSSION</span><LevelBadge value={b.readiness}/><p>Qualitative readiness to engage. This does not predict a purchase or replace banker judgment.</p><h3>Supports engagement</h3>{b.supports.length?b.supports.map((x,i)=><div className="readiness-point supports" key={i}><p>{x.text}</p><div className="inline-badges">{sources(x.sourceIds)}</div></div>):<p>No current engagement signal is documented.</p>}<h3>Limits readiness</h3>{b.limits.map((x,i)=><div className="readiness-point limits" key={i}><p>{x.text}</p><div className="inline-badges">{sources(x.sourceIds)}</div></div>)}<div className="persona-coverage"><strong>{b.coverageLabel}</strong><p>{b.coverageExplanation}</p></div></aside></div></section>;
+}

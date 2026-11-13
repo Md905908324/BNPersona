@@ -58,3 +58,10 @@ Saved Clients and Data Hub open the general client persona at `/clients/{id}`. T
 The map has seven stable themes. Atomic requirements, rationale, decision criteria, chart-to-purpose mappings and observations are grouped beneath those themes. A tidy bilateral hierarchy assigns disjoint vertical bands to subtrees and separate columns to each depth; cards never overlap as insights accumulate. Zoom, pan, branch focus and subtree collapse/expand remain available. Reviewed evidence is opened from the inspector rather than duplicated as a mandatory leaf below every fact.
 
 Gemini returns atomic, semantically grouped proposals with exact source excerpts. Typographic quotation and whitespace differences are aligned to the actual source span; unsupported paraphrased excerpts are rejected. Reporting rigor and simple presentation are distinct dimensions. Meeting observations and commercial inferences remain explicitly uncertain. Banker approval preserves multiple requirements of the same kind. Ask the persona answers from reviewed facts and source IDs; it does not represent a real client speaking.
+
+
+## Persona-led opportunity briefs and persona Q&A
+
+Discovery results explain a business need, a barrier and a suggested approach. The product-specific persona has a six-part opportunity brief: why it matters, why now, what could win the conversation, what could derail it, an opening, and unknowns. Readiness for discussion replaces the acceptance label and includes supporting and limiting evidence. Persona coverage is shown separately from exposure evidence. Suggestions are labeled; missing decision criteria or history is not invented.
+
+Ask the persona offers Quantitative data, Qualitative data, Behavioral data and All three question starters. Responses render CommonMark/GFM headings, lists, emphasis and tables through react-markdown, with raw HTML disabled. Specific chart types are not inferred from a spreadsheet or executive-summary preference. Dates render on the demo calendar and behavioral observations remain distinct from documented requests.
