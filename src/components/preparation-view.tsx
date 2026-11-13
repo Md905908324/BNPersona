@@ -1,4 +1,6 @@
 'use client';
+import {useEvidenceLabels} from './evidence-labels';
+import {readableEvidence} from '@/lib/evidence-labels';
 import {useState} from 'react';
 import {Check,FileText,Pencil,ShieldCheck,Sparkles} from 'lucide-react';
 import type {Client,Product,Guide,PersonaBriefing,BriefingItem} from '@/lib/types';
@@ -18,6 +20,7 @@ export function Preparing({client}:{client:Client}){
 
 export function GuideDocument({guide,updateGuide}:{guide:Guide;updateGuide:(text:string)=>void}){
  const [editing,setEditing]=useState(false);
- const chunks=calendarText(guide.text).split(/\n\n+/);
- return <><div className="guide-view-controls"><span className="eyebrow">02 / CLIENT ENGAGEMENT GUIDE</span><button className="button secondary" onClick={()=>setEditing(x=>!x)}>{editing?<Check size={15}/>:<Pencil size={15}/>} {editing?'Done editing':'Edit guide'}</button></div>{editing?<><label className="sr-only" htmlFor="guide-editor">Edit client discussion guide</label><textarea id="guide-editor" className="guide-editor" value={calendarText(guide.text)} onChange={e=>updateGuide(e.target.value)}/></>:<div className="guide-reader">{chunks.map((chunk,index)=>{const lines=chunk.split('\n');const heading=lines[0];return <section key={index}>{/^[A-Z][A-Z /-]+$/.test(heading)?<><h3>{heading}</h3><div>{lines.slice(1).join('\n')}</div></>:<div>{chunk}</div>}</section>;})}</div>}<div className="guide-paper-foot"><span><Pencil size={13}/>Edits save automatically and require a new review.</span><span>{guide.text.split(/\s+/).length} words</span></div></>;
+ const {labels}=useEvidenceLabels();const displayText=readableEvidence(guide.text,[...labels].map(([id,title])=>({id,title})));
+ const chunks=calendarText(displayText).split(/\n\n+/);
+ return <><div className="guide-view-controls"><span className="eyebrow">02 / CLIENT ENGAGEMENT GUIDE</span><button className="button secondary" onClick={()=>setEditing(x=>!x)}>{editing?<Check size={15}/>:<Pencil size={15}/>} {editing?'Done editing':'Edit guide'}</button></div>{editing?<><label className="sr-only" htmlFor="guide-editor">Edit client discussion guide</label><textarea id="guide-editor" className="guide-editor" value={calendarText(displayText)} onChange={e=>updateGuide(e.target.value)}/></>:<div className="guide-reader">{chunks.map((chunk,index)=>{const lines=chunk.split('\n');const heading=lines[0];return <section key={index}>{/^[A-Z][A-Z /-]+$/.test(heading)?<><h3>{heading}</h3><div>{lines.slice(1).join('\n')}</div></>:<div>{chunk}</div>}</section>;})}</div>}<div className="guide-paper-foot"><span><Pencil size={13}/>Edits save automatically and require a new review.</span><span>{guide.text.split(/\s+/).length} words</span></div></>;
 }

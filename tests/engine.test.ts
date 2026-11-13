@@ -41,7 +41,7 @@ test('persona briefing uses reviewed working-style evidence and keeps uncertaint
 test('distinct reporting requirements survive approval and inform preparation',()=>{
  const c=seedClients('Specialist')[0];const src={id:'SRC-report',title:'Reporting request',type:'Qualitative note',day:2,text:'A report per metric. Five years of inflation-adjusted revenue. Compare competitors. Use simple bar charts.',status:'Proposed' as const};
  const n=applyChanges(c,src,[{key:'reporting',label:'Report format',value:'A report per metric',excerpt:'A report per metric.',selected:true},{key:'reporting',label:'History requirement',value:'Five years of inflation-adjusted revenue',excerpt:'Five years of inflation-adjusted revenue.',selected:true},{key:'analysisStyle',label:'Chart style',value:'Use simple bar charts',excerpt:'Use simple bar charts.',selected:true}]);
- assert.equal(n.facts.filter(f=>f.key==='reporting').length,2);assert.equal(n.gross,c.gross);assert.match(makeGuide(n,productTemplates.FX),/Five years of inflation-adjusted revenue/);assert.match(makeGuide(n,productTemplates.FX),/Use simple bar charts/);
+ assert.equal(n.facts.filter(f=>f.key==='reporting'&&f.sourceId==='SRC-report').length,2);assert.equal(n.gross,c.gross);assert.match(makeGuide(n,productTemplates.FX),/Five years of inflation-adjusted revenue/);assert.match(makeGuide(n,productTemplates.FX),/Use simple bar charts/);
 });
 test('broader BNP product discovery uses explicit synthetic cross-business evidence',()=>{
  const clients=seedClients('Specialist');assert.ok(discover(clients,productTemplates['Corporate financing']).some(m=>m.eligible));assert.equal(interpretProduct('Interest-rate hedging for floating-rate debt'),'Interest-rate risk');

@@ -1,3 +1,4 @@
+import {enrichDemoClient} from './demo-enrichment';
 import type {Client, Product, State, Fact, Role, Source} from './types';
 export const SCENARIO_DAY = 2;
 export {productTemplates as PRODUCTS} from './products';
@@ -65,6 +66,7 @@ for(const [id,name,industry,url] of PUBLIC_COMPANIES){
 // Extra fictional cross-business requirements make the extended product catalogue demonstrable.
 const EXTENDED=Object.values(PRODUCTS).filter(p=>!['FX','Trade finance','Cash management','Custom solution'].includes(p.category));
 ALL.filter(c=>!c.restricted).forEach((c,i)=>{const p=EXTENDED[i%EXTENDED.length];const id='CB'+String(i+1).padStart(3,'0');const requirement=`Synthetic ${p.category} discussion requested: ${p.ideal}. The team would like a preliminary ${p.name} review before ${c.due===undefined?'a date to be agreed':'scenario day '+c.due}. Terms, eligibility and actual appetite need banker confirmation.`;c.sources.push({id,title:'Synthetic cross-business planning note',type:'Qualitative note',day:1,status:'Verified',reviewer:c.owner,text:'SYNTHETIC DEMO ONLY. '+requirement});c.facts.push({key:'interest',label:p.category+' discussion',value:requirement,sourceId:id,status:'Verified'});c.history[0].facts=structuredClone(c.facts);});
+ALL.forEach((client,index)=>enrichDemoClient(client,index));
 export function seedClients(role:Role):Client[]{return structuredClone(ALL.filter(c=>role==='Restricted desk'?c.restricted:!c.restricted));}
 export function allowedClient(id:string,role:Role){return ALL.some(c=>c.id===id&&(role==='Restricted desk'?c.restricted:!c.restricted));}
 export function createState(role:Role):State{return {schema:3,clients:seedClients(role),product:structuredClone(PRODUCTS.FX),searched:false,saved:[],guides:[],activity:[],proposals:[],events:[{id:'M001',title:'Peso strengthens against the US dollar',text:'Simulated USD/MXN movement from 18.00 to 17.00 MXN per USD. A fixed MXN payable requires more USD. Identify clients with remaining MXN payables and approaching payments.',source:'Synthetic market bulletin M001',day:1,tags:'MXN, Manufacturing',kind:'Currency'},{id:'I002',title:'Import suppliers request greater payment assurance',text:'Synthetic industry change: import suppliers are requesting clearer payment assurance before shipment. Identify clients with upcoming imports and a documented trade-finance need.',source:'Synthetic industry bulletin I002',day:1,tags:'Imports, Trade finance',kind:'Industry'}]};}

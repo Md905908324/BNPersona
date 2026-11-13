@@ -3,7 +3,7 @@ import {seedClients} from '../src/lib/seed';import {productTemplates} from '../s
 test('Airbus rationale connects a recorded need, production uncertainty, format and missing evidence',()=>{
  const c=seedClients('Specialist').find(c=>c.id==='vale')!;const b=opportunityBrief(c,productTemplates.FX);
  assert.match(b.headline,/flexibility/);assert.match(b.quantitative,/9,000,000/);assert.ok(b.limits.some(x=>/production/.test(x.text)));assert.ok(b.supports.some(x=>/spreadsheet/.test(x.text)));
- assert.match(b.sections.find(s=>s.title==='Recommended opening')!.text,/firm.*variable/);assert.match(b.sections.find(s=>s.title==='What we still need to learn')!.text,/approves/);assert.equal(b.sections.length,6);assert.equal(b.coverage,3);
+ assert.match(b.sections.find(s=>s.title==='Recommended opening')!.text,/firm.*variable/);assert.match(b.sections.find(s=>s.title==='What we still need to learn')!.text,/committee|approves/);assert.equal(b.sections.length,6);assert.equal(b.coverage,5);
  assert.ok(!b.sections.some(s=>/87%|probability of purchase|multi-variable/.test(s.text)));
 });
 test('cost objections and unconfirmed interest produce different discussion rationales',()=>{
