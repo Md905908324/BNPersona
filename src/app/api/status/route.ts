@@ -1,0 +1,3 @@
+import {NextResponse} from 'next/server';
+export const dynamic='force-dynamic';
+export async function GET(){const direct=Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY);const gateway=Boolean(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN||process.env.VERCEL==='1');return NextResponse.json({configured:direct||gateway,provider:direct?'Google Gemini':gateway?'Gemini via Vercel AI Gateway':'Demo rules',model:direct?(process.env.GEMINI_MODEL||'gemini-3.5-flash-lite'):(process.env.AI_GATEWAY_MODEL||'google/gemini-3.5-flash-lite'),note:'Live generation is verified when a request succeeds. Demo rules remain available.'},{headers:{'Cache-Control':'no-store'}});}
