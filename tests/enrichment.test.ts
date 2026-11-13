@@ -21,10 +21,10 @@ test('every demo relationship has distinct financial, stakeholder and operating 
  assert.equal(histories.size,31);
 });
 test('evidence names replace stable codes in text without altering unrelated text',()=>{
- const c=seedClients('Specialist').find(c=>c.id==='vale')!;
- const text=readableEvidence('[N010] [profile-vale-reporting] CB009',c.sources);
+ const c=seedClients('Specialist').find(c=>c.id==='airbus')!;
+ const text=readableEvidence('[N010] [profile-airbus-reporting] CB009',c.sources);
  assert.match(text,/Treasury discovery meeting — Airbus/);
  assert.match(text,/Reporting and communication preference interview — Airbus/);
- assert.doesNotMatch(text,/N010|CB009|profile-vale/);
+ assert.doesNotMatch(text,/N010|CB009|profile-airbus/);
  assert.equal(readableEvidence('2026 revenue forecast',c.sources),'2026 revenue forecast');
 });

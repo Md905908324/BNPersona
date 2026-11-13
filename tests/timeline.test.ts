@@ -13,7 +13,7 @@ test('calendar labels preserve existing payment urgency across month and year bo
  assert.equal(dateFromInput('2027-01-09'),60);
  assert.equal(dateFromInput('2026-02-30'),undefined);
  assert.equal(dateFromInput(''),undefined);
- assert.equal(days(seedClients('Specialist').find(c=>c.id==='meridian')!),18);
+ assert.equal(days(seedClients('Specialist').find(c=>c.id==='cemex')!),18);
  assert.equal(calendarText('Supplier payment due on scenario day 20.'),'Supplier payment due on Nov 30, 2026.');
 });
 test('a source with an explicit calendar payment date still creates a usable reviewed update',()=>{

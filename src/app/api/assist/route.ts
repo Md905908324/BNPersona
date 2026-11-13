@@ -1,3 +1,4 @@
+import {canonicalClientId,migrateLegacyRecords} from '@/lib/client-identities';
 import {NextRequest,NextResponse} from 'next/server';
 import {generateText,Output} from 'ai';
 import {google} from '@ai-sdk/google';
@@ -22,7 +23,7 @@ export async function POST(req:NextRequest){
  try{
   if(Number(req.headers.get('content-length')||0)>180000)return NextResponse.json({error:'Request is too large.'},{status:413});
   const raw=await req.text();if(raw.length>180000)return NextResponse.json({error:'Request is too large.'},{status:413});
-  const parsed=requestSchema.safeParse(JSON.parse(raw));if(!parsed.success)return NextResponse.json({error:'Please check the request fields.'},{status:400});const b=parsed.data;
+  const parsed=requestSchema.safeParse(JSON.parse(raw));if(!parsed.success)return NextResponse.json({error:'Please check the request fields.'},{status:400});const b=parsed.data;if(b.clientId)b.clientId=canonicalClientId(b.clientId);if(b.client)b.client=migrateLegacyRecords(b.client);
   let c:Client|undefined;
   if(['prepare','rehearse','extract','ask'].includes(b.task)){
    if(!b.clientId||!allowedClient(b.clientId,b.role as Role))return NextResponse.json({error:'This record is unavailable for the selected role.'},{status:403});

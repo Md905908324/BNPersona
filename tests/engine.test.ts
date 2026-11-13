@@ -4,8 +4,8 @@ import {seedClients,createState} from '../src/lib/seed';
 import {buildBriefing} from '../src/lib/preparation';
 import {productTemplates} from '../src/lib/products';
 import {discover,matchClient,remaining,applyChanges,extractChanges,makeGuide,interpretProduct} from '../src/lib/engine';
-test('FX discovery respects urgency, preserves inferred appetite and suppresses stale or unsupported exposure',()=>{const clients=seedClients('Specialist').slice(0,8);const matches=discover(clients,productTemplates.FX);const eligible=matches.filter(m=>m.eligible);assert.deepEqual(eligible.map(m=>m.client.id),['meridian','summit','northstar','atlas']);assert.equal(eligible.find(m=>m.client.id==='summit')!.acceptance,'Unknown');assert.equal(eligible.find(m=>m.client.id==='summit')!.interestStatus,'Inferred product fit');assert.equal(eligible.find(m=>m.client.id==='atlas')!.evidence,'Strong');assert.ok(!matches.find(m=>m.client.id==='ridgeway')!.eligible);assert.ok(!matches.find(m=>m.client.id==='harbor')!.eligible);});
-test('currency, horizon and product category alter results',()=>{const c=seedClients('Specialist').slice(0,8);assert.deepEqual(discover(c,{...productTemplates.FX,currencies:'MXN',horizon:30}).filter(m=>m.eligible).map(m=>m.client.id),['meridian']);assert.deepEqual(discover(c,productTemplates['Trade finance']).filter(m=>m.eligible).map(m=>m.client.id),['brookfield']);assert.deepEqual(discover(c,productTemplates['Cash management']).filter(m=>m.eligible).map(m=>m.client.id),['cedar']);});
+test('FX discovery respects urgency, preserves inferred appetite and suppresses stale or unsupported exposure',()=>{const clients=seedClients('Specialist').slice(0,8);const matches=discover(clients,productTemplates.FX);const eligible=matches.filter(m=>m.eligible);assert.deepEqual(eligible.map(m=>m.client.id),['cemex','lactalis','volvo-group','decathlon']);assert.equal(eligible.find(m=>m.client.id==='lactalis')!.acceptance,'Unknown');assert.equal(eligible.find(m=>m.client.id==='lactalis')!.interestStatus,'Inferred product fit');assert.equal(eligible.find(m=>m.client.id==='decathlon')!.evidence,'Strong');assert.ok(!matches.find(m=>m.client.id==='polygroup')!.eligible);assert.ok(!matches.find(m=>m.client.id==='arkadin')!.eligible);});
+test('currency, horizon and product category alter results',()=>{const c=seedClients('Specialist').slice(0,8);assert.deepEqual(discover(c,{...productTemplates.FX,currencies:'MXN',horizon:30}).filter(m=>m.eligible).map(m=>m.client.id),['cemex']);assert.deepEqual(discover(c,productTemplates['Trade finance']).filter(m=>m.eligible).map(m=>m.client.id),['ingram-micro']);assert.deepEqual(discover(c,productTemplates['Cash management']).filter(m=>m.eligible).map(m=>m.client.id),['ch-robinson']);});
 test('role seed payload contains no restricted relationship for coverage roles',()=>{for(const r of ['Specialist','Relationship manager'] as const){const raw=JSON.stringify(createState(r));assert.ok(!raw.includes('Juniper'));assert.ok(!raw.includes('X009'));}assert.equal(seedClients('Restricted desk').length,1);});
 test('reviewed feedback preserves gross payable and updates only remaining exposure',()=>{const c=seedClients('Specialist')[0];const text='CFO confirms MXN 6 million has now been hedged. MXN 12 million remains unhedged. She requests three scenarios for the remaining amount.';const changes=extractChanges(text);assert.equal(changes.find(x=>x.key==='hedged')!.value,6000000);assert.ok(!changes.some(x=>x.key==='gross'));const n=applyChanges(c,{id:'F001',title:'Feedback',day:2,text,type:'Interaction feedback',status:'Proposed'},changes);assert.equal(c.version,1);assert.equal(n.version,2);assert.equal(n.gross,18000000);assert.equal(remaining(n),12000000);assert.equal(n.history.length,2);assert.equal(Math.round(remaining(n)/17),705882);assert.equal(Math.round(remaining(n)/18),666667);assert.equal(Math.round(remaining(n)/19),631579);assert.ok(makeGuide(n,productTemplates.FX).includes('$705,882'));});
 test('invalid hedge amounts cannot corrupt a persona',()=>{const c=seedClients('Specialist')[0];assert.throws(()=>applyChanges(c,{id:'F002',title:'Bad feedback',day:2,text:'',type:'Note',status:'Proposed'},[{key:'hedged',label:'Hedged',value:20000000,selected:true,excerpt:''}]),/exceed/);assert.throws(()=>applyChanges(c,{id:'F003',title:'Bad feedback',day:2,text:'',type:'Note',status:'Proposed'},[{key:'gross',label:'Payable',value:-1,selected:true,excerpt:''}]),/non-negative/);});
@@ -17,9 +17,9 @@ test('expanded portfolio has 30 authorized relationships and varied needs',()=>{
  assert.equal(c.filter(x=>x.category==='FX').length,19);
  assert.equal(c.filter(x=>x.category==='Trade finance').length,5);
  assert.equal(c.filter(x=>x.category==='Cash management').length,6);
- assert.ok(!matchClient(c.find(x=>x.id==='sterling')!,productTemplates.FX).eligible);
- assert.ok(!matchClient(c.find(x=>x.id==='fulton')!,productTemplates.FX).eligible);
- assert.ok(matchClient(c.find(x=>x.id==='aurelia')!,productTemplates.FX).eligible);
+ assert.ok(!matchClient(c.find(x=>x.id==='maersk')!,productTemplates.FX).eligible);
+ assert.ok(!matchClient(c.find(x=>x.id==='alliander')!,productTemplates.FX).eligible);
+ assert.ok(matchClient(c.find(x=>x.id==='edp')!,productTemplates.FX).eligible);
 });
 test('persona briefing uses reviewed working-style evidence and keeps uncertainty explicit',()=>{
  const c=seedClients('Specialist');const north=c[0];const b=buildBriefing(north,productTemplates.FX);
@@ -30,10 +30,10 @@ test('persona briefing uses reviewed working-style evidence and keeps uncertaint
  north.sources.find(s=>s.id==='P001')!.status='Withdrawn';
  const withdrawn=buildBriefing(north,productTemplates.FX);
  assert.equal(withdrawn.dimensions.find(x=>x.title==='Scalability and adoption')!.kind,'To confirm');
- const inferred=buildBriefing(c.find(x=>x.id==='summit')!,productTemplates.FX);
+ const inferred=buildBriefing(c.find(x=>x.id==='lactalis')!,productTemplates.FX);
  assert.match(inferred.summary,/No product appetite/);
  assert.equal(inferred.dimensions.find(x=>x.title==='Preferred communication structure')!.kind,'To confirm');
- const meridian=buildBriefing(c.find(x=>x.id==='meridian')!,productTemplates.FX);
+ const meridian=buildBriefing(c.find(x=>x.id==='cemex')!,productTemplates.FX);
  assert.match(meridian.dimensions.find(x=>x.title==='Timing and buying signals')!.text,/18 days remaining/);
  assert.match(makeGuide(c[0],productTemplates.FX),/CURRENCY SENSITIVITY/);
 });
